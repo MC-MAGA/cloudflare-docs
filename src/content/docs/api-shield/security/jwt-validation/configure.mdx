@@ -170,7 +170,7 @@ If you only need JWT Validation on specific hostnames or subdomains of your apex
 
 If you need to exclude endpoints from JWT validation that never have valid JWTs used with them (by design), such as a path and method used to establish a valid JWT in the first place, you must use the endpoint’s operation ID to exclude the endpoint in a selector.
 
-To find the operation ID, refer to [Endpoint Management](/api-shield/management-and-monitoring/) or use the [Cloudflare API](/api/operations/api-shield-endpoint-management-retrieve-information-about-all-operations-on-a-zone).
+To find the operation ID, refer to [Endpoint Management](/api-shield/management-and-monitoring/) or use the [Cloudflare API](/api/resources/api_gateway/subresources/operations/methods/list/).
 
 ## Define a security policy
 
@@ -187,8 +187,8 @@ For example, the expression `is_jwt_valid("51231d16-01f1-48e3-93f8-91c99e81288e"
 
 These expressions are similar to [expressions used in Ruleset Engine](/ruleset-engine/rules-language/), with a few key differences:
 
-* The Token Validation rule actions trigger if the expression evaluates `false`, as opposed to Ruleset expressions.
-* The Token Validation rules can use dedicated functions that reference Token Configurations.
+- The Token Validation rule actions trigger if the expression evaluates `false`, as opposed to Ruleset expressions.
+- The Token Validation rules can use dedicated functions that reference Token Configurations.
 
 Operators such as `or`, `and`, `eq`, and more are usable in expressions in the same way as in expressions used in Ruleset Engine.
 

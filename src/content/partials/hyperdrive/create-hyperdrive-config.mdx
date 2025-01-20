@@ -31,29 +31,34 @@ Hyperdrive will attempt to connect to your database with the provided credential
 
 This command outputs a binding for `wrangler.toml`:
 
+import { WranglerConfig } from "~/components";
+
+<WranglerConfig>
+
 ```toml
 name = "hyperdrive-example"
 main = "src/index.ts"
-compatibility_date = "2023-09-11"
-
-node_compat = true # required for database drivers to function
+compatibility_date = "2024-08-21"
+compatibility_flags = ["nodejs_compat"]
 
 # Pasted from the output of `wrangler hyperdrive create <NAME_OF_HYPERDRIVE_CONFIG> --connection-string=[...]` above.
 [[hyperdrive]]
 binding = "HYPERDRIVE"
-id = ""
+id = "<ID OF THE CREATED HYPERDRIVE CONFIGURATION>"
 ```
+
+</WranglerConfig>
 
 Install the driver:
 
 ```sh
-npm install pg
+npm install postgres
 ```
 
 Copy the below Worker code, which passes the connection string generated from `env.HYPERDRIVE.connectionString` directly to the driver.
 
 ```ts
-import { Client } from "pg";
+import postgres from "postgres";
 
 export interface Env {
 	// If you set another name in wrangler.toml as the value for 'binding',
@@ -63,25 +68,19 @@ export interface Env {
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		console.log(JSON.stringify(env));
 		// Create a database client that connects to our database via Hyperdrive
 		// Hyperdrive generates a unique connection string you can pass to
 		// supported drivers, including node-postgres, Postgres.js, and the many
 		// ORMs and query builders that use these drivers.
-		const client = new Client({
-			connectionString: env.HYPERDRIVE.connectionString,
-		});
+		const sql = postgres(env.HYPERDRIVE.connectionString);
 
 		try {
-			// Connect to our database
-			await client.connect();
-
 			// Test query
-			const result = await client.query({ text: "SELECT * FROM pg_tables" });
+			const result = await sql`SELECT * FROM pg_tables;`;
 
 			// Returns result rows as JSON
 			return Response.json({ result: result });
-		} catch (e) {
+		} catch (e: any) {
 			console.log(e);
 			return Response.json({ error: e.message }, { status: 500 });
 		}

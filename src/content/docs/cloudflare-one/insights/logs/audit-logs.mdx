@@ -41,7 +41,7 @@ To view logs for identity-based authentication events:
 
 </TabItem> <TabItem label="API">
 
-The [Access authentication logs](/api/operations/access-authentication-logs-get-access-authentication-logs) API endpoint provides a custom URL to export audit log events for your account.
+The [Access authentication logs](/api/resources/zero_trust/subresources/access/subresources/logs/subresources/access_requests/methods/list/) API endpoint provides a custom URL to export audit log events for your account.
 
 ```bash title="Request"
 curl "https://api.cloudflare.com/client/v4/accounts/{account_id}/access/logs/access_requests?limit=25&direction=desc&since=2020-07-01T05:20:00Z&until=2020-10-01T05:20:00Z" \
@@ -86,7 +86,7 @@ Identity-based authentication logs contain the following fields:
 | **allowed**    | The result of the authentication event.                   |
 | **created_at** | The event timestamp.                                      |
 | **connection** | The IdP used to authenticate.                             |
-| **country**    | The country associated with the user’s IP address.        |
+| **country**    | The country associated with the user's IP address.        |
 | **ray_id**     | A unique identifier for every request through Cloudflare. |
 | **app_type**   | The type specifies if the app is self-hosted or SaaS.     |
 

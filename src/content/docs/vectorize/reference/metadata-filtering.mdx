@@ -5,31 +5,52 @@ sidebar:
   order: 6
 ---
 
-# Metadata Filtering
+import { Render, PackageManagers } from "~/components";
 
-:::note[Enable metadata filtering]
-
-Vectorize v2 requires to define metadata properties that will support filtering. Please refer to [Vectorize API](/vectorize/reference/client-api/#create-metadata-index) for details.
-[Namespaces](/vectorize/best-practices/insert-vectors/#namespaces) support metadata filtering by default.
-
-:::
-
-In addition to providing an input vector to your query, you can also filter by [vector metadata](/vectorize/best-practices/insert-vectors/#metadata) associated with every vector. Query results only include vectors that match `filter` criteria, meaning that `filter` is applied first, and `topK` results are taken from the filtered set.
+In addition to providing an input vector to your query, you can also filter by [vector metadata](/vectorize/best-practices/insert-vectors/#metadata) associated with every vector. Query results will only include vectors that match the `filter` criteria, meaning that `filter` is applied first, and the `topK` results are taken from the filtered set.
 
 By using metadata filtering to limit the scope of a query, you can filter by specific customer IDs, tenant, product category or any other metadata you associate with your vectors.
 
+## Metadata indexes
+
+Vectorize supports [namespace](/vectorize/best-practices/insert-vectors/#namespaces) filtering by default, but to filter on another metadata property of your vectors, you'll need to create a metadata index. You can create up to 10 metadata indexes per Vectorize index.
+
+Metadata indexes for properties of type `string`, `number` and `boolean` are supported. Please refer to [Create metadata indexes](/vectorize/get-started/intro/#4-optional-create-metadata-indexes) for details.
+
+You can store up to 10KiB of metadata per vector. See [Vectorize Limits](/vectorize/platform/limits/) for a complete list of limits.
+
+For metadata indexes of type `number`, the indexed number precision is that of float64.
+
+For metadata indexes of type `string`, each vector indexes the first 64B of the string data truncated on UTF-8 character boundaries to the longest well-formed UTF-8 substring within that limit, so vectors are filterable on the first 64B of their value for each indexed property.
+
+:::note[Enable metadata filtering]
+
+Vectors upserted before a metadata index was created won't have their metadata contained in that index. Upserting/re-upserting vectors after it was created will have them indexed as expected. Please refer to [Create metadata indexes](/vectorize/get-started/intro/#4-optional-create-metadata-indexes) for details.
+
+:::
+
 ## Supported operations
 
-Optional `filter` property on `query()` method specifies metadata filter:
+An optional `filter` property on `query()` method specifies metadata filters:
 
-| Operator | Description |
-| -------- | ----------- |
-| `$eq`    | Equals      |
-| `$ne`    | Not equals  |
+| Operator | Description              |
+| -------- | ------------------------ |
+| `$eq`    | Equals                   |
+| `$ne`    | Not equals               |
+| `$in`    | In                       |
+| `$nin`   | Not in                   |
+| `$lt`    | Less than                |
+| `$lte`   | Less than or equal to    |
+| `$gt`    | Greater than             |
+| `$gte`   | Greater than or equal to |
 
 - `filter` must be non-empty object whose compact JSON representation must be less than 2048 bytes.
 - `filter` object keys cannot be empty, contain `" | .` (dot is reserved for nesting), start with `$`, or be longer than 512 characters.
-- `filter` object non-nested values can be `string`, `number`, `boolean`, or `null` values.
+- For `$eq` and `$ne`, `filter` object non-nested values can be `string`, `number`, `boolean`, or `null` values.
+- For `$in` and `$nin`, `filter` object values can be arrays of `string`, `number`, `boolean`, or `null` values.
+- Upper-bound range queries (i.e. `$lt` and `$lte`) can be combined with lower-bound range queries (i.e. `$gt` and `$gte`) within the same filter. Other combinations are not allowed.
+- For range queries (i.e. `$lt`, `$lte`, `$gt`, `$gte`), `filter` object non-nested values can be `string` or `number` values. Strings are ordered lexicographically. 
+- Range queries involving a large number of vectors (~10M and above) may experience reduced accuracy. 
 
 ### Namespace versus metadata filtering
 
@@ -49,36 +70,70 @@ Both [namespaces](/vectorize/best-practices/insert-vectors/#namespaces) and meta
 #### Explicit operator
 
 ```json
-{ "someKey": { "$ne": true } }
+{ "someKey": { "$ne": "hbo" } }
+```
+
+#### `$in` operator
+
+```json
+{ "someKey": { "$in": ["hbo", "netflix"] } }
+```
+
+#### `$nin` operator
+
+```json
+{ "someKey": { "$nin": ["hbo", "netflix"] } }
+```
+
+#### Range query involving numbers
+
+```json
+{ "timestamp": { "$gte": 1734242400, "$lt": 1734328800 } }
+```
+
+#### Range query involving strings
+Range queries can be used to implement prefix searching on string metadata fields.
+For example, the following filter matches all values starting with "net":
+
+```json
+{ "someKey": { "$gte": "net", "$lt": "neu" } }
 ```
 
 #### Implicit logical `AND` with multiple keys
 
 ```json
-{ "pandas.nice": 42, "someKey": { "$ne": true } }
+{ "pandas.nice": 42, "someKey": { "$ne": "someValue" } }
 ```
 
 #### Keys define nesting with `.` (dot)
 
 ```json
 { "pandas.nice": 42 }
- // looks for { "pandas": { "nice": 42 } }
+
+
+// looks for { "pandas": { "nice": 42 } }
 ```
 
 ## Examples
 
 ### Add metadata
 
-:::note[Using Vectorize v1?]
-
-Please use the 'wrangler vectorize --deprecated-v1' flag to create, get, list, delete and insert vectors into legacy Vectorize v1 indexes.
-
-:::
+<Render file="vectorize-legacy" />
 
 With the following index definition:
 
 ```sh
-npx wrangler vectorize create tutorial-index --dimensions=3 --metric=cosine
+npx wrangler vectorize create tutorial-index --dimensions=32 --metric=cosine
+```
+
+Create metadata indexes:
+
+```sh
+npx wrangler vectorize create-metadata-index tutorial-index --property-name=url --type=string
+```
+
+```sh
+npx wrangler vectorize create-metadata-index tutorial-index --property-name=streaming_platform --type=string
 ```
 
 Metadata can be added when [inserting or upserting vectors](/vectorize/best-practices/insert-vectors/#examples).
@@ -87,27 +142,27 @@ Metadata can be added when [inserting or upserting vectors](/vectorize/best-prac
 const newMetadataVectors: Array<VectorizeVector> = [
 	{
 		id: "1",
-		values: [32.4, 74.1, 3.2],
+		values: [32.4, 74.1, 3.2, ...],
 		metadata: { url: "/products/sku/13913913", streaming_platform: "netflix" },
 	},
 	{
 		id: "2",
-		values: [15.1, 19.2, 15.8],
+		values: [15.1, 19.2, 15.8, ...],
 		metadata: { url: "/products/sku/10148191", streaming_platform: "hbo" },
 	},
 	{
 		id: "3",
-		values: [0.16, 1.2, 3.8],
+		values: [0.16, 1.2, 3.8, ...],
 		metadata: { url: "/products/sku/97913813", streaming_platform: "amazon" },
 	},
 	{
 		id: "4",
-		values: [75.1, 67.1, 29.9],
+		values: [75.1, 67.1, 29.9, ...],
 		metadata: { url: "/products/sku/418313", streaming_platform: "netflix" },
 	},
 	{
 		id: "5",
-		values: [58.8, 6.7, 3.4],
+		values: [58.8, 6.7, 3.4, ...],
 		metadata: { url: "/products/sku/55519183", streaming_platform: "hbo" },
 	},
 ];
@@ -121,12 +176,11 @@ let upserted = await env.YOUR_INDEX.upsert(newMetadataVectors);
 Use the `query()` method:
 
 ```ts
-let queryVector: Array<number> = [54.8, 5.5, 3.1];
-// Best match is vector id = 5 (score closet to 1)
+let queryVector: Array<number> = [54.8, 5.5, 3.1, ...];
 let originalMatches = await env.YOUR_INDEX.query(queryVector, {
 	topK: 3,
 	returnValues: true,
-	returnMetadata: true,
+	returnMetadata: 'all',
 });
 ```
 
@@ -134,6 +188,7 @@ Results without metadata filtering:
 
 ```json
 {
+	"count": 3,
 	"matches": [
 		{
 			"id": "5",
@@ -169,13 +224,12 @@ Results without metadata filtering:
 The same `query()` method with a `filter` property supports metadata filtering.
 
 ```ts
-let queryVector: Array<number> = [54.8, 5.5, 3.1];
-// Best match is vector id = 4 with metadata filter
+let queryVector: Array<number> = [54.8, 5.5, 3.1, ...];
 let metadataMatches = await env.YOUR_INDEX.query(queryVector, {
 	topK: 3,
 	filter: { streaming_platform: "netflix" },
 	returnValues: true,
-	returnMetadata: true,
+	returnMetadata: 'all',
 });
 ```
 
@@ -183,6 +237,7 @@ Results with metadata filtering:
 
 ```json
 {
+	"count": 2,
 	"matches": [
 		{
 			"id": "4",
@@ -208,4 +263,5 @@ Results with metadata filtering:
 
 ## Limitations
 
-- Only newly created indexes on or after 2023-12-06 support metadata filtering. Previously created indexes cannot be migrated to support metadata filtering.
+- As of now, metadata indexes need to be created for Vectorize indexes _before_ vectors can be inserted to support metadata filtering.
+- Only indexes created on or after 2023-12-06 support metadata filtering. Previously created indexes cannot be migrated to support metadata filtering.

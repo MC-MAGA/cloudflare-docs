@@ -42,30 +42,32 @@ You can set up External Evaluation rules using any API service, but to get start
 3. Create a [Workers KV namespace](/kv/concepts/kv-namespaces/) to store the key. The binding name should be `KV` if you want to run the example as written.
 
    ```sh
-   wrangler kv:namespace create "KV"
+   npx wrangler kv namespace create "KV"
    ```
 
-   The command will output the binding name and KV namespace ID, for example `{ binding = "KV", id = "3e56d0300d714e7994c209d7aff3ccbe" }`.
+   The command will output the binding name and KV namespace ID, for example
+
+   ```txt
+     [[kv_namespaces]]
+      binding = "KV"
+      id = "YOUR_KV_NAMESPACE_ID"
+   ```
 
 4. Open `wrangler.toml` in a text editor and insert the following:
 
-   - `<ACCOUNT_ID>`: your Cloudflare [account ID](/fundamentals/setup/find-account-and-zone-ids/).
-   - `<KV_NAMESPACE_ID>`: the `id` of your KV namespace.
+   - `[[kv_namespaces]]`: Add the output generated in the previous step.
    - `<TEAM_NAME>`: your Cloudflare Zero Trust <GlossaryTooltip term="team name">team name</GlossaryTooltip>.
 
    ```txt
    name = "my-worker"
-   type = "javascript"
-
-   account_id = "<ACCOUNT_ID>"
    workers_dev = true
-   route = ""
-   zone_id = ""
-   compatibility_date = "2022-05-16"
+   compatibility_date = "2024-08-06"
+   main = "index.js"
 
-   kv_namespaces = [
-   { binding = "KV", id = "<KV_NAMESPACE_ID>" }
-   ]
+
+   [[kv_namespaces]]
+   binding = "KV"
+   id = "YOUR_KV_NAMESPACE_ID"
 
    [vars]
    TEAM_DOMAIN="<TEAM_NAME>.cloudflareaccess.com"
@@ -104,19 +106,25 @@ Other key formats (such as DSA) are not supported at this time.
 
 ### 4. Create an External Evaluation rule
 
-1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Access** > **Applications**.
+1. In [Zero Trust](https://one.dash.cloudflare.com/), go to **Access** > **Policies**.
 
-2. Find the application for which you want to apply the External Evaluation rule and select **Edit**.
+2. Edit an existing policy or select **Add a policy**.
 
-3. In the **Policies** tab, edit an existing policy or select **Add a policy**.
-
-4. Add the following rule to your policy:
+3. Add the following rule to your policy:
 
 | Rule Type | Selector            | Evaluate URL                                      | Keys URL                                               |
 | --------- | ------------------- | ------------------------------------------------- | ------------------------------------------------------ |
 | Include   | External Evaluation | `https://my-worker.<YOUR_SUBDOMAIN>.workers.dev/` | `https://my-worker.<YOUR_SUBDOMAIN>.workers.dev/keys/` |
 
-When a user logs in to your application, Access will now check their email, device, location, and other identity-based data against your business logic. To test your policies against an email, go to the **Policies** tab and select **Test your policies**.
+4. Save the policy.
+
+5. Go to **Access** > **Applications** and edit the application for which you want to apply the External Evaluation rule.
+
+6. In the **Policies** tab, add the policy that contains the External Evaluation rule.
+
+7. Select **Save application**.
+
+When a user logs in to your application, Access will now check their email, device, location, and other identity-based data against your business logic.
 
 ### Troubleshooting the Worker
 

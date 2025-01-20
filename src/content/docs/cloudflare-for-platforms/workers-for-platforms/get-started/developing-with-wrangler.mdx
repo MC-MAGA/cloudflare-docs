@@ -9,7 +9,7 @@ import { Render, PackageManagers } from "~/components";
 
 To test your [Dispatch Worker](/cloudflare-for-platforms/workers-for-platforms/reference/how-workers-for-platforms-works/#dynamic-dispatch-worker), [user Worker](/cloudflare-for-platforms/workers-for-platforms/reference/how-workers-for-platforms-works/#user-workers) and [Outbound Worker](/cloudflare-for-platforms/workers-for-platforms/configuration/outbound-workers/) before deploying to production, you can use [Wrangler](/workers/wrangler) for development and testing.
 
-:::undefined
+:::note
 
 Support for Workers for Platforms with `wrangler dev` in local mode is experimental and may change in the future. Use the prerelease branch: `wrangler@dispatch-namespaces-dev` to try Workers for Platforms locally.
 :::
@@ -26,9 +26,9 @@ Support for Workers for Platforms with `wrangler dev` in local mode is experimen
 	file="c3-post-run-steps"
 	product="workers"
 	params={{
-		one: "Hello World example",
-		two: "Hello World Worker",
-		three: "JavaScript",
+		category: "hello-world",
+		type: "Hello World Worker",
+		lang: "JavaScript",
 	}}
 />
 
@@ -54,11 +54,17 @@ export default {
 
 Update the `wrangler.toml` file for customer-worker-1 and add the dispatch namespace:
 
+import { WranglerConfig } from "~/components";
+
+<WranglerConfig>
+
 ```toml
 # ... other content above ...
 
 dispatch_namespace = "my-namespace"
 ```
+
+</WranglerConfig>
 
 ## 2. Create a dispatch worker
 
@@ -72,9 +78,9 @@ dispatch_namespace = "my-namespace"
 	file="c3-post-run-steps"
 	product="workers"
 	params={{
-		one: "Hello World example",
-		two: "Hello World Worker",
-		three: "JavaScript",
+		category: "hello-world",
+		type: "Hello World Worker",
+		lang: "JavaScript",
 	}}
 />
 
@@ -107,6 +113,10 @@ export default {
 
 Update the `wrangler.toml` file for dispatch-worker and add the dispatch namespace binding:
 
+
+
+<WranglerConfig>
+
 ```toml
 # ... other content above ...
 
@@ -115,6 +125,8 @@ binding = "DISPATCH_NAMESPACE"
 namespace = "my-namespace"
 outbound = { service = "outbound-worker", parameters = ["paramCustomerName"] }
 ```
+
+</WranglerConfig>
 
 ## 3. Create an Outbound Worker
 
@@ -128,9 +140,9 @@ outbound = { service = "outbound-worker", parameters = ["paramCustomerName"] }
 	file="c3-post-run-steps"
 	product="workers"
 	params={{
-		one: "Hello World example",
-		two: "Hello World Worker",
-		three: "JavaScript",
+		category: "hello-world",
+		type: "Hello World Worker",
+		lang: "JavaScript",
 	}}
 />
 

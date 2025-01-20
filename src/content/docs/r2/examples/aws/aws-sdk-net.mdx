@@ -1,6 +1,6 @@
 ---
 title: aws-sdk-net
-pcx_content_type: configuration
+pcx_content_type: example
 
 ---
 
@@ -13,6 +13,18 @@ This example uses version 3 of the [aws-sdk-net](https://www.nuget.org/packages/
 ## Client setup
 
 In this example, you will pass credentials explicitly to the `IAmazonS3` initialization. If you wish, use a shared AWS credentials file or the SDK store in-line with other AWS SDKs. Refer to [Configure AWS credentials](https://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/net-dg-config-creds.html) for more details.
+
+:::note[Compatibility]
+Client version `3.7.963.0` introduced a modification to the default checksum behavior from the client that is currently incompatible with R2 APIs.
+
+To mitigate, users can use `3.7.962.0` or add the following to their AmazonS3Config:
+
+```csharp
+RequestChecksumCalculation = "WHEN_REQUIRED",
+ResponseChecksumValidation = "WHEN_REQUIRED"
+```
+
+:::
 
 ```csharp
 private static IAmazonS3 s3Client;
@@ -54,7 +66,7 @@ static async Task ListObjectsV2()
 	{
 		BucketName = "sdk-example"
 	};
-            
+
 	var response = await s3Client.ListObjectsV2Async(request);
 
 	foreach (var s3Object in response.S3Objects)
@@ -87,9 +99,9 @@ static async Task PutObject()
 		BucketName = "sdk-example",
 		DisablePayloadSigning = true
 	};
-            
+
 	var response = await s3Client.PutObjectAsync(request);
-            
+
 	Console.WriteLine("ETag: {0}", response.ETag);
 }
 // ETag: "186a71ee365d9686c3b98b6976e1f196"
@@ -100,7 +112,7 @@ static async Task GetObject()
 {
   var bucket = "sdk-example";
   var key = "file.txt"
-  
+
 	var response = await s3Client.GetObjectAsync(bucket, key);
 
 	Console.WriteLine("ETag: {0}", response.ETag);
@@ -123,12 +135,12 @@ static string? GeneratePresignedUrl()
 		Verb = HttpVerb.GET,
 		Expires = DateTime.Now.AddDays(7),
 	};
-            
+
 	var presignedUrl = s3Client.GetPreSignedURL(presign);
-            
+
 	Console.WriteLine(presignedUrl);
-	
+
 	return presignedUrl;
 }
-// URL: https://<accountid>.r2.cloudflarestorage.com/sdk-example/file.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=<credential>&X-Amz-Date=<timestamp>&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=<signature>   
+// URL: https://<accountid>.r2.cloudflarestorage.com/sdk-example/file.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=<credential>&X-Amz-Date=<timestamp>&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=<signature>
 ```

@@ -1,6 +1,6 @@
 ---
 title: aws CLI
-pcx_content_type: configuration
+pcx_content_type: example
 ---
 
 import { Render } from "~/components";
@@ -9,6 +9,13 @@ import { Render } from "~/components";
 <br />
 
 With the [`aws`](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) CLI installed, you may run [`aws configure`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config) to configure a new profile. You will be prompted with a series of questions for the new profile's details.
+
+:::note[Compatibility]
+Client versions `2.23.0` and `1.37.0` introduced a modification to the default checksum behavior from the client that is currently incompatible with R2 APIs.
+
+To mitigate, users can use `2.22.35` or `1.36.40` as the documented overrides do not work consistently for all subcommands.
+
+:::
 
 ```shell
 aws configure
@@ -58,6 +65,8 @@ You can also generate presigned links which allow you to share public access to 
 
 ```sh
 # You can pass the --expires-in flag to determine how long the presigned link is valid.
+$ aws s3 presign --endpoint-url https://<accountid>.r2.cloudflarestorage.com  s3://sdk-example/ferriswasm.png --expires-in 3600
+# https://<accountid>.r2.cloudflarestorage.com/sdk-example/ferriswasm.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=<credential>&X-Amz-Date=<timestamp>&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=<signature>
 aws s3 presign --endpoint-url https://<accountid>.r2.cloudflarestorage.com  s3://sdk-example/ferriswasm.png --expires-in 3600
 # https://<accountid>.r2.cloudflarestorage.com/sdk-example/ferriswasm.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=<credential>&X-Amz-Date=<timestamp>&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=<signature>
 ```

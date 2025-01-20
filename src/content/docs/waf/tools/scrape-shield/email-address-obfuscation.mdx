@@ -31,7 +31,7 @@ To disable **Email Address Obfuscation** in the dashboard:
 
 </TabItem> <TabItem label="API">
 
-To disable **Email Address Obfuscation** with the API, send a [`PATCH`](/api/operations/zone-settings-edit-single-setting) request with `email_obfuscation` as the setting name in the URI path, and the `value` parameter set to `"off"`.
+To disable **Email Address Obfuscation** with the API, send a [`PATCH`](/api/resources/zones/subresources/settings/methods/edit/) request with `email_obfuscation` as the setting name in the URI path, and the `value` parameter set to `"off"`.
 
 </TabItem> </Tabs>
 
@@ -59,14 +59,14 @@ To prevent unexpected website behavior, email addresses are not obfuscated when 
 
 - Any HTML tag attribute, except for the _href_ attribute of the _a_ tag.
 - Other HTML tags:
-  - *script* tags: `<script></script>`
-  - *noscript* tags: `<noscript></noscript>`
-  - *textarea* tags: `<textarea></textarea>`
-  - *xmp* tags: `<xmp></xmp>`
-  - *head* tags: `<head></head>`
+  - _script_ tags: `<script></script>`
+  - _noscript_ tags: `<noscript></noscript>`
+  - _textarea_ tags: `<textarea></textarea>`
+  - _xmp_ tags: `<xmp></xmp>`
+  - _head_ tags: `<head></head>`
 - Any page that does not have a MIME type of `text/html` or `application/xhtml+xml`.
 
-:::caution[Warnings]
+:::caution
 
 Email Obfuscation will not apply in the following cases:
 

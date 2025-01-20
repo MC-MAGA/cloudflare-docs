@@ -3,8 +3,9 @@ pcx_content_type: configuration
 title: Wrangler
 sidebar:
   order: 20
-
 ---
+
+import { Render, WranglerConfig } from "~/components"
 
 [Wrangler](/workers/wrangler/) is a command-line tool for building with Cloudflare developer products.
 
@@ -20,20 +21,21 @@ To install Wrangler, refer to [Install and Update Wrangler](/workers/wrangler/in
 
 To deploy a Browser Rendering Worker, you must declare a [browser binding](/workers/runtime-apis/bindings/) in your Worker's `wrangler.toml` configuration file.
 
-:::note[Wrangler configuration]
+<Render file="nodejs-compat-howto" product="workers" />
 
-If you are using [Puppeteer](/browser-rendering/platform/puppeteer/) in your Worker code, then you also need to add `node_compat = true` to your Worker's `wrangler.toml` configuration. More information [here](/workers/runtime-apis/nodejs/#enable-nodejs-with-workers), including for [pages functions](/workers/runtime-apis/nodejs/#enable-nodejs-with-pages-functions). 
-:::
+<WranglerConfig>
 
 ```toml
 # Top-level configuration
 name = "browser-rendering"
 main = "src/index.ts"
-node_compat = true
 workers_dev = true
+compatibility_flags = ["nodejs_compat_v2"]
 
 browser = { binding = "MYBROWSER" }
 ```
+
+</WranglerConfig>
 
 After the binding is declared, access the DevTools endpoint using `env.MYBROWSER` in your Worker code:
 

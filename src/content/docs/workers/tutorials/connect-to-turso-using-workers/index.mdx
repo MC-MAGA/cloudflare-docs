@@ -116,9 +116,9 @@ To create a new Workers project (named `worker-turso-ts`), run the following:
 	file="c3-post-run-steps"
 	product="workers"
 	params={{
-		one: "Hello World example",
-		two: "Hello World Worker",
-		three: "TypeScript",
+		category: "hello-world",
+		type: "Hello World Worker",
+		lang: "TypeScript",
 	}}
 />
 
@@ -156,10 +156,16 @@ libsql://my-db-<your-github-username>.turso.io
 
 Open `wrangler.toml` in your editor and at the bottom of the file, create a new `[vars]` section representing the [environment variables](/workers/configuration/environment-variables/) for your project:
 
+import { WranglerConfig } from "~/components";
+
+<WranglerConfig>
+
 ```toml
 [vars]
 LIBSQL_DB_URL = "paste-your-url-here"
 ```
+
+</WranglerConfig>
 
 Save the changes to `wrangler.toml`.
 
@@ -236,7 +242,7 @@ export default {
 			env.router = buildRouter(env);
 		}
 
-		return env.router.handle(request);
+		return env.router.fetch(request);
 	},
 } satisfies ExportedHandler<Env>;
 

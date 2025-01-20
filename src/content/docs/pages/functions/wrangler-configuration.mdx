@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-import { Render, TabItem, Tabs } from "~/components";
+import { Render, TabItem, Tabs, Type, MetaInfo } from "~/components";
 
 :::caution
 
@@ -34,6 +34,10 @@ Using `wrangler.toml` to configure your Pages project allows you to:
 
 ## Example `wrangler.toml` file
 
+import { WranglerConfig } from "~/components";
+
+<WranglerConfig>
+
 ```toml
 name = "my-pages-app"
 pages_build_output_dir = "./dist"
@@ -51,11 +55,13 @@ database_id = "<DATABASE_ID>"
 API_KEY = "1234567asdf"
 ```
 
+</WranglerConfig>
+
 ## Requirements
 
 ### V2 build system
 
-Pages Functions configuration via `wrangler.toml` requires the [V2 build system](/pages/configuration/language-support-and-tools/) or later. To update from V1, refer to the [V2 build system migration instructions](/pages/configuration/language-support-and-tools/#v2-build-system).
+Pages Functions configuration via `wrangler.toml` requires the [V2 build system](/pages/configuration/build-image/#v2-build-system) or later. To update from V1, refer to the [V2 build system migration instructions](/pages/configuration/build-image/#v1-to-v2-migration).
 
 ### Wrangler
 
@@ -71,11 +77,17 @@ Before you could use `wrangler.toml` to define your preview and production confi
 
 If you have been using `wrangler.toml` for local development, you may already have a file in your Pages project that looks like this:
 
+
+
+<WranglerConfig>
+
 ```toml
 [[kv_namespaces]]
 binding = "KV"
 id = "<NAMESPACE_ID>"
 ```
+
+</WranglerConfig>
 
 If you would like to use your existing `wrangler.toml` file for your Pages project configuration, you must:
 
@@ -130,7 +142,7 @@ Refer to [this guide](/workers/configuration/compatibility-dates/) for more info
 
 If you have used [Workers](/workers), you may already be familiar with [`wrangler.toml`](/workers/wrangler/configuration/). There are a few key differences to be aware of when using `wrangler.toml` with your Pages Functions project:
 
-- The configuration fields **do not match exactly** between Pages Functions `wrangler.toml` file and the Workers equivalent. For example, configuration keys like `main`, which are Workers specific, do not apply to a Pages Function's `wrangler.toml`.
+- The configuration fields **do not match exactly** between Pages Functions `wrangler.toml` file and the Workers equivalent. For example, configuration keys like `main`, which are Workers specific, do not apply to a Pages Function's `wrangler.toml`. Some functionality supported by Workers, such as [module aliasing](/workers/wrangler/configuration/#module-aliasing) cannot yet be used by Cloudflare Pages projects.
 - The Pages `wrangler.toml` introduces a new key, `pages_build_output_dir`, which is only used for Pages projects.
 - The concept of [environments](/pages/functions/wrangler-configuration/#configure-environments) and configuration inheritance in this file **is not** the same as Workers.
 - This file becomes the [source of truth](/pages/functions/wrangler-configuration/#source-of-truth) when used, meaning that you **can not edit the same fields in the dashboard** once you are using this file.
@@ -143,6 +155,10 @@ With `wrangler.toml` you can quickly set configuration across your local environ
 
 `wrangler.toml` works locally when using `wrangler pages dev`. This means that you can test out configuration changes quickly without a need to login to the Cloudflare dashboard. Refer to the following config file for an example:
 
+
+
+<WranglerConfig>
+
 ```toml
 name = "my-pages-app"
 pages_build_output_dir = "./dist"
@@ -153,6 +169,8 @@ compatibility_flags = ["nodejs_compat"]
 binding = "KV"
 id = "<NAMESPACE_ID>"
 ```
+
+</WranglerConfig>
 
 This `wrangler.toml` configuration file adds the `nodejs_compat` compatibility flag and a KV namespace binding to your Pages project. Running `wrangler pages dev` in a Pages project directory with this `wrangler.toml` configuration file will apply the `nodejs_compat` compatibility flag locally, and expose the `KV` binding in your Pages Function code at `context.env.KV`.
 
@@ -204,6 +222,10 @@ Unlike [Workers Environments](/workers/wrangler/configuration/#environments), `p
 
 Refer to the following `wrangler.toml` configuration file for an example of how to override preview deployment configuration:
 
+
+
+<WranglerConfig>
+
 ```toml
 name = "my-pages-site"
 pages_build_output_dir = "./dist"
@@ -223,9 +245,15 @@ id = "<PREVIEW_NAMESPACE_ID>"
 API_KEY = "8901234bfgd"
 ```
 
+</WranglerConfig>
+
 If you deployed this file via `wrangler pages deploy`, `name`, `pages_build_output_dir`, `kv_namespaces`, and `vars` would apply the configuration to local and production, while `env.preview` would override `kv_namespaces` and `vars` for preview deployments.
 
 If you wanted to have configuration values apply to local and preview, but override production, your file would look like this:
+
+
+
+<WranglerConfig>
 
 ```toml
 name = "my-pages-site"
@@ -246,7 +274,13 @@ id = "<PRODUCTION_NAMESPACE_ID>"
 API_KEY = "8901234bfgd"
 ```
 
+</WranglerConfig>
+
 You can always be explicit and override both preview and production:
+
+
+
+<WranglerConfig>
 
 ```toml
 name = "my-pages-site"
@@ -274,19 +308,21 @@ id = "<PRODUCTION_NAMESPACE_ID>"
 API_KEY = "6567875fvgt"
 ```
 
+</WranglerConfig>
+
 ## Inheritable keys
 
 Inheritable keys are configurable at the top-level, and can be inherited (or overridden) by environment-specific configuration.
 
-- `name` string required
+- `name` <Type text="string" /> <MetaInfo text="required" />
 
   - The name of your Pages project. Alphanumeric and dashes only.
 
-- `pages_build_output_dir` string required
+- `pages_build_output_dir` <Type text="string" /> <MetaInfo text="required" />
 
   - The path to your project's build output folder. For example: `./dist`.
 
-- `compatibility_date` string required
+- `compatibility_date` <Type text="string" /> <MetaInfo text="required" />
 
   - A date in the form `yyyy-mm-dd`, which will be used to determine which version of the Workers runtime is used. Refer to [Compatibility dates](/workers/configuration/compatibility-dates/).
 
@@ -294,9 +330,9 @@ Inheritable keys are configurable at the top-level, and can be inherited (or ove
 
   - A list of flags that enable features from upcoming features of the Workers runtime, usually used together with `compatibility_date`. Refer to [compatibility dates](/workers/configuration/compatibility-dates/).
 
-- `send_metrics` boolean optional
+- `send_metrics` <Type text="boolean" /> <MetaInfo text="optional" />
 
-  - Whether Wrangler should send usage metrics to Cloudflare for this project.
+  - Whether Wrangler should send usage data to Cloudflare for this project. Defaults to `true`. You can learn more about this in our [data policy](https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md).
 
 - `limits` Limits optional
 
@@ -316,6 +352,10 @@ Non-inheritable keys are configurable at the top-level, but, if any one non-inhe
 
 For example, this configuration will not work:
 
+
+
+<WranglerConfig>
+
 ```toml
 name = "my-pages-site"
 pages_build_output_dir = "./dist"
@@ -331,51 +371,53 @@ API_KEY = "1234567asdf"
 API_KEY = "8901234bfgd"
 ```
 
+</WranglerConfig>
+
 `[[env.production.vars]]` is set to override `[vars]`. Because of this `[[kv_namespaces]]` must also be overridden by defining `[[env.production.kv_namespaces]]`.
 
 This will work for local development, but will fail to validate when you try to deploy.
 
-- `vars` object optional
+- `vars` <Type text="object" /> <MetaInfo text="optional" />
 
   - A map of environment variables to set when deploying your Function. Refer to [Environment variables](/pages/functions/bindings/#environment-variables).
 
-- `d1_databases` object optional
+- `d1_databases` <Type text="object" /> <MetaInfo text="optional" />
 
   - A list of D1 databases that your Function should be bound to. Refer to [D1 databases](/pages/functions/bindings/#d1-databases).
 
-- `durable_objects` object optional
+- `durable_objects` <Type text="object" /> <MetaInfo text="optional" />
 
   - A list of Durable Objects that your Function should be bound to. Refer to [Durable Objects](/pages/functions/bindings/#durable-objects).
 
-- `hyperdrive` object optional
+- `hyperdrive` <Type text="object" /> <MetaInfo text="optional" />
 
   - Specifies Hyperdrive configs that your Function should be bound to. Refer to [Hyperdrive](/pages/functions/bindings/#r2-buckets).
 
-- `kv_namespaces` object optional
+- `kv_namespaces` <Type text="object" /> <MetaInfo text="optional" />
 
   - A list of KV namespaces that your Function should be bound to. Refer to [KV namespaces](/pages/functions/bindings/#kv-namespaces).
 
-- `queues.producers` object optional
+- `queues.producers` <Type text="object" /> <MetaInfo text="optional" />
 
   - Specifies Queues Producers that are bound to this Function. Refer to [Queues Producers](/queues/get-started/#4-set-up-your-producer-worker).
 
-- `r2_buckets` object optional
+- `r2_buckets` <Type text="object" /> <MetaInfo text="optional" />
 
   - A list of R2 buckets that your Function should be bound to. Refer to [R2 buckets](/pages/functions/bindings/#r2-buckets).
 
-- `vectorize` object optional
+- `vectorize` <Type text="object" /> <MetaInfo text="optional" />
 
   - A list of Vectorize indexes that your Function should be bound to. Refer to [Vectorize indexes](/vectorize/get-started/intro/#3-bind-your-worker-to-your-index).
 
-- `services` object optional
+- `services` <Type text="object" /> <MetaInfo text="optional" />
 
   - A list of service bindings that your Function should be bound to. Refer to [service bindings](/pages/functions/bindings/#service-bindings).
 
-- `analytics_engine_datasets` object optional
+- `analytics_engine_datasets` <Type text="object" /> <MetaInfo text="optional" />
 
   - Specifies analytics engine datasets that are bound to this Function. Refer to [Workers Analytics Engine](/analytics/analytics-engine/get-started/).
 
-- `ai` object optional
+- `ai` <Type text="object" /> <MetaInfo text="optional" />
 
   - Specifies an AI binding to this Function. Refer to [Workers AI](/pages/functions/bindings/#workers-ai).
 
@@ -389,7 +431,7 @@ A [binding](/pages/functions/bindings/) enables your Pages Functions to interact
 
 ### D1 databases
 
-[D1](/d1/) is Cloudflare's serverless SQL database. A Function can query a D1 database (or databases) by creating a [binding](/workers/runtime-apis/bindings/) to each database for D1's [client API](/d1/build-with-d1/d1-client-api/).
+[D1](/d1/) is Cloudflare's serverless SQL database. A Function can query a D1 database (or databases) by creating a [binding](/workers/runtime-apis/bindings/) to each database for [D1 Workers Binding API](/d1/worker-api/).
 
 :::note
 

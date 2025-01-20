@@ -10,10 +10,7 @@ head:
 
 import { TabItem, Tabs } from "~/components";
 
-You need to create an Access Control List (ACL) in certain situations:
-
-- If Cloudflare is your [primary DNS provider](/dns/zone-setups/zone-transfers/cloudflare-as-primary/), create an ACL to specify additional IPs Cloudflare should accept zone transfer requests from.
-- If Cloudflare is your [secondary DNS provider](/dns/zone-setups/zone-transfers/cloudflare-as-secondary/), create an ACL to specify additional NOTIFY IPs that Cloudflare should listen to.
+You need to create an Access Control List (ACL) if Cloudflare is your [secondary DNS provider](/dns/zone-setups/zone-transfers/cloudflare-as-secondary/). The ACL will specify additional NOTIFY IPs that Cloudflare should listen to.
 
 An ACL is configured at the account level, which means that it will apply to every primary and secondary zone in your account.
 
@@ -32,6 +29,6 @@ To create a new ACL using the dashboard:
 
 </TabItem> <TabItem label="API">
 
-To create a new ACL using the API, send a [POST](</api/operations/secondary-dns-(-acl)-create-acl>) request.
+To create a new ACL using the API, send a [POST](/api/resources/dns/subresources/zone_transfers/subresources/acls/methods/create/) request.
 
 </TabItem> </Tabs>

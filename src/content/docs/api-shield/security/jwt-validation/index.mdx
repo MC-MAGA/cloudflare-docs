@@ -40,8 +40,8 @@ To automatically keep your JWKS up to date when your identity provider refreshes
 5. Deselect any endpoints that you want JWT Validation to ignore (for example, an endpoint used to generate a JWT).
 6. Select the Token Validation Configuration that corresponds to the incoming requests.
 7. Choose whether to strictly enforce token presence on these endpoints.
-   * You may not expect 100% of clients to send in JWTs with their requests. If this is the case, choose *Ignore*. JWT Validation will still validate JWTs that are present.
-   * You may otherwise expect all requests to the selected hostname and endpoints to contain JWTs. If this is the case, choose *Mark as non-compliant*.
+  - You may not expect 100% of clients to send in JWTs with their requests. If this is the case, choose *Ignore*. JWT Validation will still validate JWTs that are present.
+  - You may otherwise expect all requests to the selected hostname and endpoints to contain JWTs. If this is the case, choose *Mark as non-compliant*.
 8. Choose an action to take for non-compliant requests. For example, JWTs that do not pass validation (expired, tampered with, or bad signature tokens) or requests with missing JWTs when *Mark as non-compliant* is selected in the previous step.
 9. Select **Save**.
 
@@ -69,4 +69,4 @@ JWT Validation is available for all API Shield customers. Enterprise customers w
 Currently, the following known limitations exist:
 
 1. JWT Validation only operates on JWTs sent in client request headers or cookies. If your clients send in JWTs in a `POST` body, direct that feedback to your account team.
-2. JWT Validation only operates for <GlossaryTooltip term="API endpoint">endpoints</GlossaryTooltip> (host, method, and path) added to Endpoint Management. You can add all of your endpoints to endpoint management through [API Discovery](/api-shield/management-and-monitoring/#add-endpoints-from-api-discovery), [Schema Validation](/api-shield/management-and-monitoring/#add-endpoints-from-schema-validation), [manually via the Cloudflare dashboard](/api-shield/management-and-monitoring/#add-endpoints-manually), or via the [API](/api/operations/api-shield-endpoint-management-add-operations-to-a-zone).
+2. JWT Validation only operates for <GlossaryTooltip term="API endpoint">endpoints</GlossaryTooltip> (host, method, and path) added to Endpoint Management. You can add all of your endpoints to endpoint management through [API Discovery](/api-shield/management-and-monitoring/#add-endpoints-from-api-discovery), [Schema Validation](/api-shield/management-and-monitoring/#add-endpoints-from-schema-validation), [manually via the Cloudflare dashboard](/api-shield/management-and-monitoring/#add-endpoints-manually), or via the [API](/api/resources/api_gateway/subresources/operations/methods/create/).

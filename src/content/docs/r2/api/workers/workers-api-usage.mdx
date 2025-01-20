@@ -22,9 +22,9 @@ To get started, open a terminal window and run:
 	file="c3-post-run-steps"
 	product="workers"
 	params={{
-		one: "Hello World example",
-		two: "Hello World Worker",
-		three: "JavaScript",
+		category: "hello-world",
+		type: "Hello World Worker",
+		lang: "JavaScript",
 	}}
 />
 
@@ -39,13 +39,13 @@ cd r2-worker
 Create your bucket by running:
 
 ```sh
-wrangler r2 bucket create <YOUR_BUCKET_NAME>
+npx wrangler r2 bucket create <YOUR_BUCKET_NAME>
 ```
 
 To check that your bucket was created, run:
 
 ```sh
-wrangler r2 bucket list
+npx wrangler r2 bucket list
 ```
 
 After running the `list` command, you will see all bucket names, including the one you have just created.
@@ -64,11 +64,17 @@ A binding is defined in the `wrangler.toml` file of your Worker project's direct
 
 To bind your R2 bucket to your Worker, add the following to your `wrangler.toml` file. Update the `binding` property to a valid JavaScript variable identifier and `bucket_name` to the `<YOUR_BUCKET_NAME>` you used to create your bucket in [step 2](#2-create-your-bucket):
 
+import { WranglerConfig } from "~/components";
+
+<WranglerConfig>
+
 ```toml
 [[r2_buckets]]
 binding = 'MY_BUCKET' # <~ valid JavaScript variable name
 bucket_name = '<YOUR_BUCKET_NAME>'
 ```
+
+</WranglerConfig>
 
 Find more detailed information on configuring your Worker in the [Wrangler Configuration documentation](/workers/wrangler/configuration/).
 
@@ -187,13 +193,13 @@ export default {
 For this to work, you need to create a secret via Wrangler:
 
 ```sh
-wrangler secret put AUTH_KEY_SECRET
+npx wrangler secret put AUTH_KEY_SECRET
 ```
 
 This command will prompt you to enter a secret in your terminal:
 
 ```sh
-wrangler secret put AUTH_KEY_SECRET
+npx wrangler secret put AUTH_KEY_SECRET
 ```
 
 ```sh output

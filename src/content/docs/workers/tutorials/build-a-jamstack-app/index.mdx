@@ -35,9 +35,9 @@ First, use the [`create-cloudflare`](https://www.npmjs.com/package/create-cloudf
 	file="c3-post-run-steps"
 	product="workers"
 	params={{
-		one: "Hello World example",
-		two: "Hello World Worker",
-		three: "JavaScript",
+		category: "hello-world",
+		type: "Hello World Worker",
+		lang: "JavaScript",
 	}}
 />
 
@@ -81,7 +81,7 @@ For the remainder of this tutorial you will complete each task, iterating on you
 
 To begin, you need to understand how to populate your todo list with actual data. To do this, use [Cloudflare Workers KV](/kv/) — a key-value store that you can access inside of your Worker to read and write data.
 
-To get started with KV, set up a namespace. All of your cached data will be stored inside that namespace and, with configuration, you can access that namespace inside the Worker with a predefined variable. Use Wrangler to create a new namespace called `TODOS` with the [`kv:namespace create` command](/workers/wrangler/commands/#create-3) and get the associated namespace ID by running the following command in your terminal:
+To get started with KV, set up a namespace. All of your cached data will be stored inside that namespace and, with configuration, you can access that namespace inside the Worker with a predefined variable. Use Wrangler to create a new namespace called `TODOS` with the [`kv:namespace create` command](/workers/wrangler/commands/#kv-namespace-create) and get the associated namespace ID by running the following command in your terminal:
 
 ```sh title="Create a new KV namespace"
 npx wrangler kv:namespace create "TODOS" --preview
@@ -89,11 +89,17 @@ npx wrangler kv:namespace create "TODOS" --preview
 
 The associated namespace can be combined with a `--preview` flag to interact with a preview namespace instead of a production namespace. Namespaces can be added to your application by defining them inside your Wrangler configuration. Copy your newly created namespace ID, and in your `wrangler.toml`, define a `kv_namespaces` key to set up your namespace:
 
+import { WranglerConfig } from "~/components";
+
+<WranglerConfig>
+
 ```toml
 kv_namespaces = [
   {binding = "TODOS", id = "<YOUR_ID>", preview_id = "<YOUR_PREVIEW_ID>"}
 ]
 ```
+
+</WranglerConfig>
 
 The defined namespace, `TODOS`, will now be available inside of your codebase. With that, it is time to understand the [KV API](/kv/api/). A KV namespace has three primary methods you can use to interface with your cache: `get`, `put`, and `delete`.
 
